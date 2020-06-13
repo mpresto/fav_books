@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Books: My Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="wrapper container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="/books">Welcome, {{ request.session.username }}</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+            aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                </ul>
+                <span class="navbar-text"><a class="navbar" href="/books">Home</a></span>
+                <span class="navbar-text"><a class="navbar" href="/books/profile/{{logged_user.id}}">Profile</a></span>
+                <span class="navbar-text"><a class="btn btn-sm btn-light text-dark" href="/logout" role="button">Log out</a></span>
+            </div>
+        </nav>
+
+        {% if messages %}
+            <ul class="messages">    
+                {% for message in messages %}    
+                    <li>{{ message }}</li>    
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+
+        <div class="row">
+            <div class="col p-4 m-1">
+                <h2 class="display-7">My Favorite Books</h2>
+                {% for book in logged_user.liked_books.all %}
+                <div class="form-group">
+                    <ul>
+                        <li><h5>{{ book.title }}</h5></li>
+                        {% if logged_user in book.liked_by.all %}
+                        &mdash; <a href="/books/destroy_favorite/{{book.id}}">Unfavorite</a>
+                        {% elif logged_user not in book.liked_by.all %}
+                        &mdash; <a href="/books/favorite/{{book.id}}">Add to Favorites!</a>
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

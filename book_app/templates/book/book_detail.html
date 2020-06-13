@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Books: Book Detail Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="wrapper container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="/books">Welcome, {{ request.session.username }}</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+            aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                </ul>
+                <span class="navbar-text"><a class="navbar" href="/books">Home</a></span>
+                <span class="navbar-text"><a class="navbar" href="/books/profile/{{logged_user.id}}">Profile</a></span>
+                <span class="navbar-text"><a class="btn btn-sm btn-light text-dark" href="/logout" role="button">Log out</a></span>
+            </div>
+        </nav>
+
+        {% if messages %}
+            <ul class="messages">    
+                {% for message in messages %}    
+                    <li>{{ message }}</li>    
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+
+        <div class="row">
+            <div class="col p-4 m-1">
+                {% if this_book.uploaded_by == logged_user %}
+                <form action="/books/update/{{this_book.id}}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <h2><input type="text" class="form-control form-control-lg" name="title" value="{{ this_book.title }}"></h2>
+                    </div>
+                    <div class="form-group">
+                        <p>Added by: {{ this_book.uploaded_by.first_name }} {{ this_book.uploaded_by.last_name }}</p>
+                    </div>
+                    <div class="form-group">
+                        <p>Added on: {{ this_book.created_at }}</p>
+                    </div>
+                    <div class="form-group">
+                        <p>Last updated on {{ this_book.updated_at }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="desc">Description:</label>
+                        <textarea class="form-control rounded-0" rows="3" style="resize:none;" name="desc">{{ this_book.desc }}</textarea>
+                    </div>
+                    <!-- <input type="hidden" name="book_id" value="{{this_book.id}}"> -->
+                    <button type="submit" class="btn btn-primary">Update</button></a>
+                    <a href="/books/destroy/{{this_book.id}}" class="btn btn-danger">Delete</a>
+                </form>
+                {% endif %}
+
+                {% if this_book.uploaded_by != logged_user %}
+                <div class="form-group">
+                    <h2>{{ this_book.title }}</h2>
+                    <p>Added by: {{ this_book.uploaded_by.first_name }} {{ this_book.uploaded_by.last_name }}</p>
+                    <p>Added on: {{ this_book.created_at }}</p>
+                    <p>Last updated on {{ this_book.updated_at }}</p>
+                    <p>Description: {{ this_book.desc }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col p-4 m-1">
+                <h2 class="display-7">Users Who Like This Book</h2>
+                {% for user in this_book.liked_by.all %}
+                {% if user == logged_user %}
+                <ul>
+                    <li>{{ logged_user.first_name }} {{ logged_user.last_name }} | 
+                        <a href="/books/destroy_favorite/{{this_book.id}}">Unfavorite</a></li>
+                </ul>
+                {% else %}
+                <ul>
+                    <li>{{ user.first_name }} {{ user.last_name }}</li>
+                </ul>
+                {% endif %}
+                {% if logged_user not in this_book.liked_by.all %}
+                <a href="/books/favorite/{{this_book.id}}">Add to Favorites!</a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
